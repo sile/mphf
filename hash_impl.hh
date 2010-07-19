@@ -11,7 +11,7 @@ namespace MPHF {
       Param(unsigned ini, unsigned mul, unsigned eor) 
 	: ini(ini), mul(mul), eor(eor) {}
       Param() 
-	: ini(rand()%0x1000+1), mul(rand()%0x1000+3), eor(rand()%0x1000+2) {}
+	: ini(rand()%1000+1), mul(rand()%1000+3), eor(rand()%1000+2) {}
       
       const unsigned ini;
       const unsigned mul;
@@ -24,17 +24,9 @@ namespace MPHF {
     static void set_seed(unsigned seed) { srand(seed); }
     
     unsigned hash(const char* key, unsigned size) const {
-      const unsigned* uk = reinterpret_cast<const unsigned*>(key);
-      
       unsigned h = param.ini;
-      unsigned i = 0;
-      
-      for(; i < size; i += sizeof(unsigned), uk++) 
-	h = (h*param.mul + *uk) ^ param.eor;
-      
-      for(; i < size; i++) 
+      for(unsigned i=0; i < size; i++)
 	h = (h*param.mul + key[i]) ^ param.eor;
-      
       return h;
     }
     

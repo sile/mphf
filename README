@@ -24,7 +24,8 @@ $ make
     - MPHF生成コマンド
 $ mkmphf [--mapping-loop-limit=<N>] [--hash-code-scale=<D>] <index> <keyset>
 --mapping-loop-limit=<N> := マッピングステップの試行回数。 デフォルトは32
---hash-code-scale=<D>    := ハッシュ値の最大値を算出するためのスケール。 デフォルトは2.09。 ※ D > 2.0 である必要がある
+--hash-code-scale=<D>    := ハッシュ値の最大値を算出するためのスケール。 デフォルトは2.09。 
+                            ※ D > 2.0 である必要がある
 index                    := 生成されるMPHFインデックス
 keyset                   := 入力キーセット。改行区切り
 

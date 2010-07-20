@@ -6,7 +6,7 @@
 namespace MPHF {
   class BitVector {
     const static unsigned PER_BLOCK_SIZE = sizeof(unsigned)*8;
-    const static unsigned RANK_INDEX_INTERVAL = PER_BLOCK_SIZE*4;
+    const static unsigned RANK_INDEX_INTERVAL = PER_BLOCK_SIZE*8;
     const static unsigned BR_RATE = RANK_INDEX_INTERVAL/PER_BLOCK_SIZE;
 
   public:
@@ -78,15 +78,10 @@ namespace MPHF {
 
     unsigned block_rank(unsigned block_num, unsigned offset) const {
       unsigned r=0;
-      for(unsigned i=0; i < BR_RATE; i++, offset-=32) {
-	if(offset >= 32) {
-	  r += log_count(blocks[block_num+i]);
-	} else {
-	  r += log_count(blocks[block_num+i] & ((2 << offset)-1));
-	  break;
-	}	 
-      }
-      return r;
+      unsigned i=0;
+      for(; offset >= 32; i++, offset-=32)
+	r += log_count(blocks[block_num+i]);
+      return r + log_count(blocks[block_num+i] & ((2 << offset)-1));
     }
     
   public:

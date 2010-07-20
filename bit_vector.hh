@@ -1,16 +1,20 @@
 #ifndef MPHF_BIT_VECTOR_HH
 #define MPHF_BIT_VECTOR_HH
 
+#include <cstring>
+
 namespace MPHF {
   class BitVector {
     const static unsigned PER_BLOCK_SIZE = sizeof(unsigned)*8;
-    const static unsigned RANK_INDEX_INTERVAL = PER_BLOCK_SIZE*3;
+    const static unsigned RANK_INDEX_INTERVAL = PER_BLOCK_SIZE*2;
 
   public:
     static BitVector* allocate(unsigned bit_length, bool need_rank_index=false) {
+      unsigned* blocks = new unsigned[ceil(bit_length,PER_BLOCK_SIZE)];
+      memset(blocks, 0, sizeof(unsigned)*ceil(bit_length, PER_BLOCK_SIZE));
+      
       return 
-	new BitVector(bit_length, 
-		      new unsigned[ceil(bit_length,PER_BLOCK_SIZE)],
+	new BitVector(bit_length, blocks,
 		      need_rank_index ? new unsigned[ceil(bit_length,RANK_INDEX_INTERVAL)] : NULL);
     }
     static void free(BitVector* bv) {
@@ -30,26 +34,32 @@ namespace MPHF {
       return blocks[pos/PER_BLOCK_SIZE] & (1<<(pos%PER_BLOCK_SIZE));
     }
 
+    unsigned get(unsigned pos) const {
+      return static_cast<unsigned>(is_1bit(pos));
+    }
+
     void build_rank_index() {
       unsigned* ri = const_cast<unsigned*>(rank_index);
-      unsigned limit = ceil(bit_length, RANK_INDEX_INTERVAL);
+      unsigned limit = rank_index_size();
       unsigned acc_1bit_count=0;
-      for(unsigned i=0; i < limit-1; i++) {
+      for(unsigned i=0; i < limit; i++) {
 	ri[i] = acc_1bit_count;
-	acc_1bit_count += log_count(blocks[i*2])+log_count(blocks[i*2+1]);
+	if(i != limit-1)
+	  acc_1bit_count += log_count(blocks[i*2])+log_count(blocks[i*2+1]);
       }
-      if(limit != 0)
-	ri[limit-1] = acc_1bit_count;
     }
     
     unsigned rank(unsigned pos) const {
       unsigned ri     = pos/RANK_INDEX_INTERVAL;
       unsigned offset = pos%RANK_INDEX_INTERVAL;
-      return rank_index[ri] + block_rank(ri*2, offset);
+      return rank_index[ri] + block_rank(ri*2, offset) - 1;
     }
 
     unsigned block_size() const { return ceil(bit_length, PER_BLOCK_SIZE); }
     unsigned rank_index_size() const { return ceil(bit_length, RANK_INDEX_INTERVAL); }
+    
+    static unsigned block_size(unsigned bit_length) { return ceil(bit_length, PER_BLOCK_SIZE); }
+    static unsigned rank_index_size(unsigned bit_length) { return ceil(bit_length, RANK_INDEX_INTERVAL); }
     
   private:
     static unsigned log_count(unsigned n) {

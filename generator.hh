@@ -4,6 +4,7 @@
 #include "hash_impl.hh"
 #include "bit_vector.hh"
 #include <ctime>
+#include <cstdlib>
 #include <fstream>
 #include <string>
 #include <algorithm>
@@ -49,20 +50,21 @@ namespace MPHF {
     }
 
     void assigning() {
-      std::vector<bool> visited(hash_value_limit);
-      std::vector<unsigned char> assign_tmp(hash_value_limit);
+      std::vector<bool> visited(hash_value_limit, false);
+      std::vector<char> assign_tmp(hash_value_limit, 2);
 
       for(unsigned i=0; i < key_count; i++) {
 	for(unsigned nth=0; nth < 2; nth++) {
 	  unsigned v = graph[i][nth];
 	  if(visited[v] == false) {
-	    assign_tmp[v] = nth;
+	    char tmp = nth;
 	    for(unsigned nth=0; nth < 2; nth++)
-	      assign_tmp[v] -= assign_tmp[graph[i][nth]];
-	    assign_tmp[v] %= 2;
+	      tmp -= assign_tmp[graph[i][nth]];
+	    assign_tmp[v] = abs(tmp%2);
 	    break;
 	  }
 	}
+
 	for(unsigned nth=0; nth < 2; nth++)
 	  visited[graph[i][nth]] = true;
       }
@@ -87,6 +89,23 @@ namespace MPHF {
     void ranking() {
       rank_bv->build_rank_index();
     }
+    /*
+    unsigned mphf(const char* key, unsigned size) const {
+      const unsigned middle = hash_value_limit/2;
+      unsigned h1 = h[0].hash(key,size)%middle;
+      unsigned h2 = h[1].hash(key,size)%middle+middle;
+
+      if(rank_bv->is_1bit(h1)==false)
+	return rank_bv->rank(h2);
+      if(rank_bv->is_1bit(h2)==false)
+	return rank_bv->rank(h1);
+      
+      unsigned v[2] = {rank_bv->rank(h[0].hash(key,size)%middle),
+		       rank_bv->rank(h[1].hash(key,size)%middle+middle)};
+      unsigned i = hash_assign_bv->get(v[0]) + hash_assign_bv->get(v[1]);
+      return v[i%2];
+    }
+    */
     
     void save(std::ofstream& out) const {
       out.write(reinterpret_cast<const char*>(&key_count), sizeof(unsigned));

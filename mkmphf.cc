@@ -18,16 +18,18 @@ int count_line(const char* filepath) {
 
 int main(int argc, char** argv) {
   if(argc != 3) {
-    std::cerr << "Usage: mkmphf <index> <keyset>" << std::endl;
+    std::cerr << "Usage: mkmphf [--mapping-try-limit=N] [--c=D] <index> <keyset>" << std::endl;
     return 1;
   }
   
-  const char* keyset_filepath = argv[1];
-  const char* index_filepath = argv[2];
+  const char* keyset_filepath = argv[2];
+  const char* index_filepath = argv[1];
   
+  std::cerr << "= Initialize" << std::endl;
   MPHF::Generator gen(keyset_filepath);
-  std::cerr << "= Key Count: " << gen.key_count << std::endl;
-  std::cerr << "= Hash Value Limit: " << gen.hash_value_limit << std::endl;
+  std::cerr << "  == key count: " << gen.key_count << std::endl;
+  std::cerr << "  == hash value limit: " << gen.hash_value_limit << std::endl;
+  std::cerr << "DONE" << std::endl;
   
   std::cerr << "= Mapping Step: " << std::endl;
   int try_count=0;
@@ -37,7 +39,7 @@ int main(int argc, char** argv) {
       break;
   }
   if(try_count==32) {
-    std::cerr << "Failure - try limit exceeded" << std::endl;
+    std::cerr << "Failure: try limit exceeded" << std::endl;
     return 3;
   }
   std::cerr << "Done" << std::endl;
@@ -54,7 +56,7 @@ int main(int argc, char** argv) {
   std::ofstream out(index_filepath);
   if(!out) {
     std::cerr << "Can't open file: " << index_filepath << std::endl;
-    return 1;
+    return 4;
   }
   gen.save(out);
   std::cerr << "Done" << std::endl;

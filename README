@@ -59,7 +59,7 @@ class MPHF::Hash;
 
 【参考】
 - Fabiano C. Botelho, Rasmus Pagh and Nivio Ziviani、『Simple and Space-Efficient Minimal Perfect Hash Functions』、Springer LNCS(volume. 4619)、2007、p139-150
-
+- http://d.hatena.ne.jp/sile/20100716/1279313240
 
 【TODO】
 - 文字列に対するハッシュ値計算方法改善 (hash_impl.hh)

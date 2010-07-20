@@ -7,7 +7,7 @@
 
 
 【バージョン】
-- 0.0.1
+- 0.0.2
 
 
 【ビルド方法】
@@ -22,9 +22,10 @@ $ make
 【コマンド】
 == mkmphf: 
     - MPHF生成コマンド
-$ mkmphf [--mapping-loop-limit=<N>] [--hash-code-scale=<D>] <index> <keyset>
+$ mkmphf [--mapping-loop-limit=<N>] [--hash-code-scale=<D>] [--hash-seed=<N>] <index> <keyset>
 --mapping-loop-limit=<N> := マッピングステップの試行回数。 デフォルトは32
 --hash-code-scale=<D>    := ハッシュ値の最大値を算出するためのスケール。 デフォルトは2.09  ※ D > 2.0 である必要がある
+--hash-seed=<N>          := ハッシュ関数生成時に用いられる乱数のシード。 省略された場合はtime(NULL)の値が用いられる。
 index                    := 生成されるMPHFインデックス
 keyset                   := 入力キーセット。改行区切り
 

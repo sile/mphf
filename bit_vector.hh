@@ -6,7 +6,8 @@
 namespace MPHF {
   class BitVector {
     const static unsigned PER_BLOCK_SIZE = sizeof(unsigned)*8;
-    const static unsigned RANK_INDEX_INTERVAL = PER_BLOCK_SIZE*2;
+    const static unsigned RANK_INDEX_INTERVAL = PER_BLOCK_SIZE*4;
+    const static unsigned BR_RATE = RANK_INDEX_INTERVAL/PER_BLOCK_SIZE;
 
   public:
     static BitVector* allocate(unsigned bit_length, bool need_rank_index=false) {
@@ -45,14 +46,15 @@ namespace MPHF {
       for(unsigned i=0; i < limit; i++) {
 	ri[i] = acc_1bit_count;
 	if(i != limit-1)
-	  acc_1bit_count += log_count(blocks[i*2])+log_count(blocks[i*2+1]);
+	  for(unsigned j=0; j < BR_RATE; j++)
+	    acc_1bit_count += log_count(blocks[i*BR_RATE+j]);
       }
     }
     
     unsigned rank(unsigned pos) const {
       unsigned ri     = pos/RANK_INDEX_INTERVAL;
       unsigned offset = pos%RANK_INDEX_INTERVAL;
-      return rank_index[ri] + block_rank(ri*2, offset) - 1;
+      return rank_index[ri] + block_rank(ri*BR_RATE, offset) - 1;
     }
 
     unsigned block_size() const { return ceil(bit_length, PER_BLOCK_SIZE); }
@@ -75,11 +77,16 @@ namespace MPHF {
     }
 
     unsigned block_rank(unsigned block_num, unsigned offset) const {
-      if(offset < 32)
-	return log_count(blocks[block_num] & ((2 << offset)-1));
-
-      return log_count(blocks[block_num]) +
-	     log_count(blocks[block_num+1] & ((2 << (offset-32))-1));
+      unsigned r=0;
+      for(unsigned i=0; i < BR_RATE; i++, offset-=32) {
+	if(offset >= 32) {
+	  r += log_count(blocks[block_num+i]);
+	} else {
+	  r += log_count(blocks[block_num+i] & ((2 << offset)-1));
+	  break;
+	}	 
+      }
+      return r;
     }
     
   public:

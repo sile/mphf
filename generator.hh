@@ -17,6 +17,7 @@ namespace MPHF {
       unsigned& operator[](unsigned index) { return vertices[index]; }
       unsigned operator[](unsigned index) const { return vertices[index]; }
     };
+    
     struct VertexLessThan {
       VertexLessThan(unsigned nth_vertex) : nth_vertex(nth_vertex) {}
       
@@ -36,6 +37,7 @@ namespace MPHF {
       
       graph = new Edge[key_count+1];
     }
+    
     ~Generator() {
       delete [] h;
       delete [] graph;
@@ -91,23 +93,6 @@ namespace MPHF {
     void ranking() {
       rank_bv->build_rank_index();
     }
-    /*
-    unsigned mphf(const char* key, unsigned size) const {
-      const unsigned middle = hash_value_limit/2;
-      unsigned h1 = h[0].hash(key,size)%middle;
-      unsigned h2 = h[1].hash(key,size)%middle+middle;
-
-      if(rank_bv->is_1bit(h1)==false)
-	return rank_bv->rank(h2);
-      if(rank_bv->is_1bit(h2)==false)
-	return rank_bv->rank(h1);
-      
-      unsigned v[2] = {rank_bv->rank(h[0].hash(key,size)%middle),
-		       rank_bv->rank(h[1].hash(key,size)%middle+middle)};
-      unsigned i = hash_assign_bv->get(v[0]) + hash_assign_bv->get(v[1]);
-      return v[i%2];
-    }
-    */
     
     void save(std::ofstream& out) const {
       out.write(reinterpret_cast<const char*>(&key_count), sizeof(unsigned));
@@ -137,7 +122,7 @@ namespace MPHF {
 	return 0;
       
       std::string line;
-      while(getline(in, line))
+      while(std::getline(in, line))
 	count++;
       
       return count;
@@ -147,16 +132,17 @@ namespace MPHF {
       const unsigned middle = hash_value_limit/2;
       std::ifstream in(keyset_filepath);
       std::string key;
-      for(unsigned i=0; getline(in,key); i++) {
+      for(unsigned i=0; std::getline(in,key); i++) {
 	graph[i][0] = h[0].hash(key.c_str()) % middle;
 	graph[i][1] = h[1].hash(key.c_str()) % middle + middle;
       }
       
-      // 番兵値
+      // sentinel value
       graph[key_count][0] = hash_value_limit+1;
       graph[key_count][1] = hash_value_limit+1;
     }
 
+    // Is the graph acyclic?
     bool check_and_sort_graph() {
       unsigned beg=0;
       unsigned prev=0;
@@ -167,7 +153,7 @@ namespace MPHF {
 	
 	for(unsigned i=beg; i < key_count; i++)
 	  if(graph[i][side] != graph[i+1][side])
-	    std::swap(graph[beg++], graph[i]);
+	    std::swap(graph[beg++], graph[i]);   // leaf vertex
 	  else
 	    for(i++; graph[i][side] == graph[i+1][side]; i++);
 	
@@ -185,6 +171,7 @@ namespace MPHF {
     Edge* graph;
     BitVector* rank_bv;
     BitVector* hash_assign_bv;
+    
   public:
     const unsigned key_count;
     const unsigned hash_value_limit;

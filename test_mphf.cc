@@ -24,7 +24,7 @@ int main(int argc, char** argv) {
   std::cerr << "= Read keyset and calculate hash values:" << std::endl;
   while(std::getline(std::cin, line)) 
     hash_values.push_back(hash.mphf(line.c_str()));
-  std::cerr << "  == key count: " << hash_values.size() << std::endl;
+  std::cerr << "  == read key count: " << hash_values.size() << std::endl;
   std::cerr << "DONE" << std::endl;
   
   std::cerr << "= Uniqueness check: " << std::endl;
@@ -36,6 +36,13 @@ int main(int argc, char** argv) {
     unsigned dup_rate = 100 - (((end-hash_values.begin())*100)/hash_values.size());
     std::cerr << "  == failure: duplicate rate is " << dup_rate << "%" << std::endl;
   }
+  std::cerr << "DONE" << std::endl;
+
+  std::cerr << "= Minimalness check: " << std::endl;
+  if(hash_values.back() == hash_values.size()-1)
+    std::cerr << "  == OK" << std::endl;
+  else
+    std::cerr << "  == failure" << std::endl;
   std::cerr << "DONE" << std::endl;
 
   return 0;

@@ -58,7 +58,7 @@ int main(int argc, char** argv) {
   }
   if(loop_count==loop_limit) {
     std::cerr << "Failure: loop limit exceeded" << std::endl;
-    return 3;
+    return 1;
   }
   std::cerr << "Done" << std::endl;
     
@@ -74,9 +74,10 @@ int main(int argc, char** argv) {
   std::ofstream out(index_filepath);
   if(!out) {
     std::cerr << "Can't open file: " << index_filepath << std::endl;
-    return 4;
+    return 1;
   }
   gen.save(out);
   std::cerr << "Done" << std::endl;
+
   return 0;
 }

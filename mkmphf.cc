@@ -7,15 +7,17 @@
 
 #define OPT1 "--mapping-loop-limit"
 #define OPT2 "--hash-code-scale"
+#define OPT3 "--hash-seed"
 
 int main(int argc, char** argv) {
   if(argc < 3) {
-    std::cerr << "Usage: mkmphf [--mapping-loop-limit=<N>] [--hash-code-scale=<D>] <index> <keyset>" << std::endl;
+    std::cerr << "Usage: mkmphf [--mapping-loop-limit=<N>] [--hash-code-scale=<D>] [--hash-seed=<N>] <index> <keyset>" << std::endl;
     return 1;
   }
 
   int param_i=1;
   int loop_limit=32;
+  int hash_seed=-1;
   double hash_code_scale=2.09;
   
   for(; param_i < argc; param_i++) {
@@ -23,6 +25,8 @@ int main(int argc, char** argv) {
       loop_limit = atoi(argv[param_i]+strlen(OPT1"="));
     } else if (strncmp(argv[param_i], OPT2"=", strlen(OPT2"="))==0) {
       hash_code_scale = atof(argv[param_i]+strlen(OPT2"="));
+    } else if (strncmp(argv[param_i], OPT3"=", strlen(OPT3"="))==0) {
+      hash_seed = atoi(argv[param_i]+strlen(OPT3"="));
     } else if (strncmp(argv[param_i], "--", 2) != 0) {
       break;
     } else {
@@ -35,7 +39,7 @@ int main(int argc, char** argv) {
   const char* index_filepath = argv[param_i];
 
   std::cerr << "= Initialize" << std::endl;
-  MPHF::Generator gen(keyset_filepath, hash_code_scale);
+  MPHF::Generator gen(keyset_filepath, hash_code_scale, hash_seed);
   if(!gen) {
     std::cerr << "Can't open file(or file is empty): " << keyset_filepath << std::endl;
     return 1;    

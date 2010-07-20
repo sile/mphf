@@ -24,8 +24,7 @@ $ make
     - MPHF生成コマンド
 $ mkmphf [--mapping-loop-limit=<N>] [--hash-code-scale=<D>] <index> <keyset>
 --mapping-loop-limit=<N> := マッピングステップの試行回数。 デフォルトは32
---hash-code-scale=<D>    := ハッシュ値の最大値を算出するためのスケール。 デフォルトは2.09。 
-                            ※ D > 2.0 である必要がある
+--hash-code-scale=<D>    := ハッシュ値の最大値を算出するためのスケール。 デフォルトは2.09  ※ D > 2.0 である必要がある
 index                    := 生成されるMPHFインデックス
 keyset                   := 入力キーセット。改行区切り
 
@@ -39,12 +38,13 @@ index := mkmphfコマンドが生成したMPHFインデックス
 
 == test_mphf: 
     - テストコマンド
-    - 標準入力よりキーリストを読み込み、それらに対して一意なハッシュ値を生成しているかどうかをテストする ※1
+    - 標準入力よりキーリストを読み込み、それらに対して一意なハッシュ値を生成しているかどうかをテストする 
+      ※ XXX: 最小性のチェックが抜けている
 $ test_mphf <index>
 index := mkmphfコマンドが生成したMPHFインデックス
 
 
-※1: XXX: 最小性のチェックが抜けている
+
 
 
 【API】
@@ -54,10 +54,10 @@ class MPHF::Hash;
 
 
 【備考】
-- mkmphfコマンドの使用メモリ量: keyset.size*8 + max_hash_code + α byte => 約 keyset.size * 10byte  ※2
+- mkmphfコマンドの使用メモリ量: keyset.size*8 + max_hash_code + α byte => 約 keyset.size * 10byte  ※1
 - MPHFインデックスサイズ: keyset.size + max_hash_code + max_hash_code/8 bit => 約 keyset.size * 3.4 bit
 
-※2: max_hash_code = keyset.size * hash-code-scale
+※1: max_hash_code = keyset.size * hash-code-scale
 
 
 【参考】

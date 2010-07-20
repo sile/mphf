@@ -44,9 +44,6 @@ $ test_mphf <index>
 index := mkmphfコマンドが生成したMPHFインデックス
 
 
-
-
-
 【API】
 class MPHF::Generator;
 class MPHF::Hash;

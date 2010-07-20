@@ -7,17 +7,16 @@ namespace MPHF {
   class BitVector {
     const static unsigned PER_BLOCK_SIZE = sizeof(unsigned)*8;
     const static unsigned RANK_INDEX_INTERVAL = PER_BLOCK_SIZE*8;
-    const static unsigned BR_RATE = RANK_INDEX_INTERVAL/PER_BLOCK_SIZE;
+    const static unsigned BR_TIMES = RANK_INDEX_INTERVAL/PER_BLOCK_SIZE;
 
   public:
-    static BitVector* allocate(unsigned bit_length, bool need_rank_index=false) {
-      unsigned* blocks = new unsigned[ceil(bit_length,PER_BLOCK_SIZE)];
-      memset(blocks, 0, sizeof(unsigned)*ceil(bit_length, PER_BLOCK_SIZE));
+    static BitVector* allocate(unsigned bit_length, bool use_rank=false) {
+      unsigned* blocks = new unsigned[block_size(bit_length)];
+      memset(blocks, 0, sizeof(unsigned)*block_size(bit_length));
       
-      return 
-	new BitVector(bit_length, blocks,
-		      need_rank_index ? new unsigned[ceil(bit_length,RANK_INDEX_INTERVAL)] : NULL);
+      return new BitVector(bit_length, blocks, use_rank ? new unsigned[rank_index_size(bit_length)] : NULL);
     }
+    
     static void free(BitVector* bv) {
       if(bv) {
 	delete [] bv->blocks;
@@ -48,19 +47,19 @@ namespace MPHF {
       for(unsigned i=0; i < limit; i++) {
 	ri[i] = acc_1bit_count;
 	if(i != limit-1)
-	  for(unsigned j=0; j < BR_RATE; j++)
-	    acc_1bit_count += log_count(blocks[i*BR_RATE+j]);
+	  for(unsigned j=0; j < BR_TIMES; j++)
+	    acc_1bit_count += log_count(blocks[i*BR_TIMES+j]);
       }
     }
     
     unsigned rank(unsigned pos) const {
       unsigned ri     = pos/RANK_INDEX_INTERVAL;
       unsigned offset = pos%RANK_INDEX_INTERVAL;
-      return rank_index[ri] + block_rank(ri*BR_RATE, offset) - 1;
+      return rank_index[ri] + block_rank(ri*BR_TIMES, offset) - 1;
     }
 
-    unsigned block_size() const { return ceil(bit_length, PER_BLOCK_SIZE); }
-    unsigned rank_index_size() const { return ceil(bit_length, RANK_INDEX_INTERVAL); }
+    unsigned block_size() const { return block_size(bit_length); }
+    unsigned rank_index_size() const { return rank_index_size(bit_length); }
     
     static unsigned block_size(unsigned bit_length) { return ceil(bit_length, PER_BLOCK_SIZE); }
     static unsigned rank_index_size(unsigned bit_length) { return ceil(bit_length, RANK_INDEX_INTERVAL); }
@@ -80,16 +79,15 @@ namespace MPHF {
 
     unsigned block_rank(unsigned block_num, unsigned offset) const {
       unsigned r=0;
-      unsigned i=0;
-      for(; offset >= 32; i++, offset-=32)
-	r += log_count(blocks[block_num+i]);
-      return r + log_count(blocks[block_num+i] & ((2 << offset)-1));
+      for(; offset >= 32; block_num++, offset-=32)
+	r += log_count(blocks[block_num]);
+      return r + log_count(blocks[block_num] & ((2 << offset)-1));
     }
     
   public:
     const unsigned  bit_length;
-    const unsigned* blocks;
-    const unsigned* rank_index;
+    const unsigned* const blocks;
+    const unsigned* const rank_index;
   };
 }
 

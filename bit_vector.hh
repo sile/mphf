@@ -19,8 +19,10 @@ namespace MPHF {
 		      need_rank_index ? new unsigned[ceil(bit_length,RANK_INDEX_INTERVAL)] : NULL);
     }
     static void free(BitVector* bv) {
-      delete [] bv->blocks;
-      delete [] bv->rank_index;
+      if(bv) {
+	delete [] bv->blocks;
+	delete [] bv->rank_index;
+      }
     }
 
     BitVector(unsigned bit_length, const unsigned* blocks, const unsigned* rank_index) 

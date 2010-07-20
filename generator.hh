@@ -43,6 +43,8 @@ namespace MPHF {
       BitVector::free(hash_assign_bv);
     }
 
+    operator bool() const { return key_count != 0; }
+
     bool mapping() {
       remake_hash_impl();
       generate_graph();

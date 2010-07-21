@@ -4,6 +4,7 @@
 
 【概要】
 - 最小完全ハッシュ関数(Minimal Perfect Hash Function)のライブラリ
+- 数百万から一億個程度のキーに対して、一意なIDを手軽に付与することが目的
 
 
 【バージョン】
@@ -60,7 +61,7 @@ class MPHF::Hash;
 【参考】
 - Fabiano C. Botelho, Rasmus Pagh and Nivio Ziviani、『Simple and Space-Efficient Minimal Perfect Hash Functions』、Springer LNCS(volume. 4619)、2007、p139-150
 - http://d.hatena.ne.jp/sile/20100716/1279313240
-
+- http://d.hatena.ne.jp/sile/20100720/1279653068
 
 【TODO】
 - 文字列に対するハッシュ値計算方法改善 (hash_impl.hh)

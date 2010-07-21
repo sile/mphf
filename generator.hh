@@ -164,7 +164,7 @@ namespace MPHF {
       std::reverse(graph, graph+key_count);
       return true;
     }
-    
+
   private:
     const char* keyset_filepath;
     HashImpl* h;

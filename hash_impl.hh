@@ -11,7 +11,7 @@ namespace MPHF {
       Param(unsigned ini, unsigned mul)
 	: ini(ini), mul(mul) {} 
       Param() 
-	: ini(rand()), mul(rand()%200+30) {}
+	: ini(rand()), mul(rand()%224+32) {} 
       
       const unsigned ini;
       const unsigned mul;
@@ -33,7 +33,7 @@ namespace MPHF {
       
       if((i-=sizeof(unsigned)) != size)
 	for(; i < size; i++)
-	  h = h*param.mul + key[i] + (h>>ui_size_minus8);
+	  h = h*param.mul ^ key[i] + (h>>ui_size_minus8);
       
       return h;
     }

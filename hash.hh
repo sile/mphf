@@ -68,7 +68,7 @@ namespace MPHF {
     unsigned mphf(const char* key, unsigned size) const {
       unsigned h1 = d.h1(key,size);
       unsigned h2 = d.h2(key,size);
-
+      
       if(d.rank_bv->is_1bit(h1)==false)
 	return d.rank_bv->rank(h2);
       if(d.rank_bv->is_1bit(h2)==false)

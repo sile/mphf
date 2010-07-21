@@ -8,25 +8,33 @@ namespace MPHF {
   class HashImpl {
   public:
     struct Param {
-      Param(unsigned ini, unsigned mul, unsigned eor) 
-	: ini(ini), mul(mul), eor(eor) {}
+      Param(unsigned ini, unsigned mul)
+	: ini(ini), mul(mul) {} 
       Param() 
-	: ini(rand()%1000+1), mul(rand()%1000+3), eor(rand()%1000+2) {}
+	: ini(rand()), mul(rand()%200+30) {}
       
       const unsigned ini;
       const unsigned mul;
-      const unsigned eor;
     };
     
-    HashImpl(unsigned ini, unsigned mul, unsigned eor) : param(ini,mul,eor) {}
+    HashImpl(unsigned ini, unsigned mul) : param(ini,mul) {}
     HashImpl() {}
     
     static void set_seed(unsigned seed) { srand(seed); }
     
+    static const unsigned ui_size_minus8 = sizeof(unsigned)*8 - 8;
+
     unsigned hash(const char* key, unsigned size) const {
+      const unsigned* u = (const unsigned*)(key);
       unsigned h = param.ini;
-      for(unsigned i=0; i < size; i++)
-	h = (h*param.mul + key[i]) ^ param.eor;
+      unsigned i = sizeof(unsigned);
+      for(; i <= size; i += sizeof(unsigned), u++) 
+	h = h*param.mul ^ *u + (h>>ui_size_minus8);
+      
+      if((i-=sizeof(unsigned)) != size)
+	for(; i < size; i++)
+	  h = h*param.mul + key[i] + (h>>ui_size_minus8);
+      
       return h;
     }
     

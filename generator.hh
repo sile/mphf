@@ -74,7 +74,7 @@ namespace MPHF {
       }
       delete [] graph;
       graph = NULL;
-      
+
       rank_bv        = BitVector::allocate(hash_value_limit, true);
       hash_assign_bv = BitVector::allocate(key_count, false);
 

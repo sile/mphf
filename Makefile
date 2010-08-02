@@ -12,5 +12,8 @@ test_mphf: test_mphf.cc hash.hh bit_vector.hh hash_impl.hh
 mphf: mphf.cc hash.hh bit_vector.hh hash_impl.hh
 	${CXX} ${CXXFLAGS} -o ${@} ${@}.cc
 
+install: mkmphf test_mphf mphf
+	cp $? /usr/local/bin/
+
 clean: 
 	rm -f mkmphf test_mphf mphf
